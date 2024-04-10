@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Map of Classmates</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/latest/css/ol.css" type="text/css">
+    <style>
+        .map {
+            width: 100%;
+            height:400px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+</head>
+<body>
+    <h1>Where My Classmates Are</h1>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([-120.659615, 35.300399]), // Centering the map on Cal Poly
+                zoom: 6 // Adjusted zoom level to better visualize the locations
+            })
+        });
+
+        var locations = [
+            {coords: [-104.990251, 39.739236], people: 1, city: 'Denver, CO', color: 'rgba(135, 206, 250, 0.6)'}, // Light Blue
+            {coords: [-119.698190, 34.420830], people: 2, city: 'Santa Barbara, CA', color: 'rgba(255, 165, 0, 0.6)'}, // Orange
+            {coords: [-117.161084, 32.715738], people: 3, city: 'San Diego, CA', color: 'rgba(148, 0, 211, 0.6)'} // Dark Violet
+        ];
+
+
+        function createStyle(people, color) {
+            return new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: people * 5, // Dynamic radius based on the number of people
+                    fill: new ol.style.Fill({color: color}),
+                    stroke: new ol.style.Stroke({
+                        color: '#ffffff', // You can adjust the stroke color if needed
+                        width: 1
+                    })
+                })
+            });
+        }
+
+
+        locations.forEach(function(location) {
+            var feature = new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.fromLonLat(location.coords)),
+                name: location.city
+            });
+
+            feature.setStyle(createStyle(location.people, location.color));
+
+            var vectorSource = new ol.source.Vector({
+                features: [feature]
+            });
+
+            var vectorLayer = new ol.layer.Vector({
+                source: vectorSource
+            });
+
+            map.addLayer(vectorLayer);
+        });
+
+    </script>
+</body>
+</html>
